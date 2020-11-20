@@ -18,14 +18,15 @@
 /**
  * topCommand.js
  *
- * Build and announce lists of top viewers (Highest points, highest time spent in the channel)
+ * Build and announce lists of top viewers (Highest points, highest time spent in the channel) 
+ Составление и объявление списков самых популярных зрителей по количеству очков и самому большому времени проведенному на канале
  */
 (function() {
-    var amountPoints = $.getSetIniDbNumber('settings', 'topListAmountPoints', 5),
-        amountTime = $.getSetIniDbNumber('settings', 'topListAmountTime', 5);
+    var amountPoints = $.getSetIniDbNumber('settings', 'topListAmountPoints', 5),//переменная хранящая значение пойнтов
+        amountTime = $.getSetIniDbNumber('settings', 'topListAmountTime', 5);// переменная хранящая сумму времени
 
     /*
-     * @function reloadTop
+     * @function reloadTop - функция перезагрузки топа
      */
     function reloadTop() {
         amountPoints = $.getIniDbNumber('settings', 'topListAmountPoints');
@@ -33,17 +34,18 @@
     }
 
     /*
-     * @function getTop5
+     * @function getTop5 функция перезагрузки топа зрителей 
      *
      * @param {string} iniName
      * @returns {Array}
      */
+    // функция получения первых 5 пользователей топа по времени и очкам
     function getTop5(iniName) {
         var keys = $.inidb.GetKeysByNumberOrderValue(iniName, '', 'DESC', (iniName.equals('points') ? amountPoints + 2: amountTime + 2), 0),
             list = [],
             i,
             ctr = 0;
-
+//Цикл создания списка польхзователь по очкам или времени
         for (i in keys) {
             if (!$.isBot(keys[i]) && !$.isOwner(keys[i])) {
                 if (ctr++ == (iniName.equals('points') ? amountPoints : amountTime)) {
@@ -55,11 +57,11 @@
                 });
             }
         }
-
+//Сортировка полученного списка 
         list.sort(function(a, b) {
             return (b.value - a.value);
         });
-
+//Вернуть список пользователей взависимости от запроса(время или очки)
         if (iniName.equals('points')) {
             return list.slice(0, amountPoints);
         } else {
@@ -68,7 +70,7 @@
     }
 
     /*
-     * @event command
+     * @event command Обработчик команд 
      */
     $.bind('command', function(event) {
         var command = event.getCommand(),
@@ -77,17 +79,18 @@
             action = args[0];
 
         /**
-         * @commandpath top - Display the top people with the most points
+         * @commandpath top - Display the top people with the most points - Если пользователь введет top в чат, 
+         то система обратится к модулю очков стрима,если он доступен, и отобразит первых пяти пользоватлей,если таковые имеются
          */
         if (command.equalsIgnoreCase('top')) {
             if (!$.bot.isModuleEnabled('./systems/pointSystem.js')) {
                 return;
             }
-
+ // обращение к функции получения первых 5 пользователей по очкам
             var temp = getTop5('points'),
                 top = [],
                 i;
-
+ // добавление в массив имен пользоватлей и очков
             for (i in temp) {
                 top.push((parseInt(i) + 1) + '. ' + $.resolveRank(temp[i].username) + ' ' + $.getPointsString(temp[i].value));
             }
@@ -98,12 +101,13 @@
 
         /*
          * @commandpath toptime - Display the top people with the most time
+         // обращение к функции получения первых 5 пользователей по времени на стриме
          */
         if (command.equalsIgnoreCase('toptime')) {
             var temp = getTop5('time'),
                 top = [],
                 i;
-
+// добавление в массив имен пользоватлей и времени  
             for (i in temp) {
                 top.push((parseInt(i) + 1) + '. ' + $.resolveRank(temp[i].username) + ' ' + $.getTimeString(temp[i].value, true));
             }
@@ -114,6 +118,7 @@
 
         /*
          * @commandpath topamount - Set how many people who will show up in the !top points list
+         //определить сколько человек будет отображать команда !top
          */
         if (command.equalsIgnoreCase('topamount')) {
             if (action === undefined) {
@@ -131,6 +136,7 @@
 
         /*
          * @commandpath toptimeamount - Set how many people who will show up in the !toptime list
+         определить сколько человек будет отображать команда !toptime
          */
         if (command.equalsIgnoreCase('toptimeamount')) {
             if (action === undefined) {
@@ -147,14 +153,14 @@
         }
 
         /*
-         * @commandpath reloadtopbots - DEPRECATED. Use !reloadbots
+         * @commandpath reloadtopbots - DEPRECATED. Use !reloadbots устарело
          */
         if (command.equalsIgnoreCase('reloadtopbots')) {
             $.say($.whisperPrefix(sender) + $.lang.get('top5.reloadtopbots'));
         }
 
         /*
-         * Panel command, no command path needed.
+         * Panel command, no command path needed. Вызов функции перезагрузки, если пользователь напишет в чат reloadtop
          */
         if (command.equalsIgnoreCase('reloadtop')) {
             reloadTop();
@@ -163,6 +169,7 @@
 
     /**
      * @event initReady
+      Регистрация команды в чате и передача ее в обработчик команд
      */
     $.bind('initReady', function() {
         $.registerChatCommand('./commands/topCommand.js', 'top', 7);
