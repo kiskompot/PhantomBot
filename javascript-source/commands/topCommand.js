@@ -19,7 +19,7 @@
  * topCommand.js
  *
  * Build and announce lists of top viewers (Highest points, highest time spent in the channel) 
- Составление и объявление списков самых популярных зрителей по количеству очков и самому большому времени проведенному на канале
+ 
  */
 (function() {
     var amountPoints = $.getSetIniDbNumber('settings', 'topListAmountPoints', 5),// variable storing point value
