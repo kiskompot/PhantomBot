@@ -17,16 +17,20 @@
 
 (function() {
     $.bind('command', function(event) {
-        var sender = event.getSender(),
-            command = event.getCommand(),
-            args = event.getArgs(),
-            action = args[0],
-            subAction = args[1];
+        var sender = event.getSender(),     // - sender of message
+            command = event.getCommand(),   
+            args = event.getArgs(),         
+            action = args[0],               // - old name
+            subAction = args[1];            // - new name
 
 
         /**
          * @commandpath namechange [oldname] [newname] - Convert someones old Twitch username to his/her new Twitch name. The user will be able to keep their points, time, quotes, and more.
          */
+        //Checks whether the specified user names are defined.
+        //If one of the user names is not defined, the function aborts its execution.
+        //If both names are defined, then the variables necessary for further changing the user name are created
+        
         if (command.equalsIgnoreCase('namechange')) {
             if (action === undefined || subAction === undefined) {
                 $.say($.whisperPrefix(sender) + $.lang.get('namechange.default'));
@@ -40,6 +44,8 @@
             $.say($.whisperPrefix(sender) + $.lang.get('namechange.updating', action, subAction));
 
             // Update the default tables with that users new name if it's currently in any tables.
+            // Searches for the old username in the tables and sets the new name when it finds it. 
+            // The old name will be removed from the tables
             for (i in tables) {
                 if ($.inidb.exists(tables[i], action.toLowerCase()) == true) {
                     $.inidb.set(tables[i], subAction.toLowerCase(), $.inidb.get(tables[i], action.toLowerCase()));
@@ -60,6 +66,8 @@
             }
 
             // Announce in chat once done.
+            // If the name change was successful, the user will receive a message about changing the old name to the new one.
+            // If this fails, the user will be notified that the name was not found.
             if (changed > 0) {
                 $.say($.whisperPrefix(sender) + $.lang.get('namechange.success', action, subAction, changed));
             } else {
