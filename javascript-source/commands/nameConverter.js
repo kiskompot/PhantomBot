@@ -47,9 +47,10 @@
             // Searches for the old username in the tables and sets the new name when it finds it. 
             // The old name will be removed from the tables
             for (i in tables) {
-                if ($.inidb.exists(tables[i], action.toLowerCase()) == true) {
-                    $.inidb.set(tables[i], subAction.toLowerCase(), $.inidb.get(tables[i], action.toLowerCase()));
-                    $.inidb.del(tables[i], action.toLowerCase());
+                if ($.inidb.exists(tables[i], action.toLowerCase()) == true) // checking for a table with the specified name
+                {
+                    $.inidb.set(tables[i], subAction.toLowerCase(), $.inidb.get(tables[i], action.toLowerCase())); //setting a new name
+                    $.inidb.del(tables[i], action.toLowerCase());  //deleting an old name
                     changed++;
                 }
             }
@@ -59,7 +60,9 @@
                 jsonArr;
 
             for (i in keys) {
-                if ($.inidb.get('quotes', keys[i]).toLowerCase().indexOf(action.toLowerCase()) > -1) {
+                                     //checking for the existence of an element in the array
+                if ($.inidb.get('quotes', keys[i]).toLowerCase().indexOf(action.toLowerCase()) > -1) // if the value =-1 then there is no such value
+                {
                     jsonArr = JSON.parse($.inidb.get('quotes', keys[i]));
                     $.inidb.set('quotes', keys[i], JSON.stringify([String(subAction), String(jsonArr[1]), String(jsonArr[2]), String(jsonArr[3])]));
                 }
